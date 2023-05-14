@@ -1,0 +1,2 @@
+# Future Home
+This is an university project for the module "praxis project III". The goal is to create an application which provides a mobile optimised frontend application for the open source project io_Broker. As io_broker is a smart home solution and smart home is considered being the future, we call the project "Future Home".
