@@ -1,23 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Living Room</title>
-</head>
-<body>
+    <script>
+        window.onload = async function () {
+          try {
+            await getLivingRoomTemperatures();
+            await getDenonStatusAsync();
+          } catch (error) {
+            console.error("Error on getting temperatures:", error);
+          }
+        };
+      
+        async function getLivingRoomTemperatures() {
+          try {
+            const currentResponse = await fetch("http://192.168.178.21:8088/getPlainValue/hmip.0.devices.3014F711A0002018A99EC715.channels.1.valveActualTemperature");
+            const desiredResponse = await fetch("http://192.168.178.21:8088/getPlainValue/hmip.0.devices.3014F711A0002018A99EC715.channels.1.setPointTemperature");
+      
+            const currentData = await currentResponse.json();
+            const desiredData = await desiredResponse.json();
+      
+            document.getElementById("livingRoomTemp").textContent = JSON.stringify(currentData, null, 2);
+            document.getElementById("desiredLivingRoomTemp").textContent = JSON.stringify(desiredData, null, 2);
+          } catch (error) {
+            console.error("Error on getting temperatures:", error);
+            document.getElementById("livingRoomTemp").textContent = "n/a";
+            document.getElementById("desiredLivingRoomTemp").textContent = "n/a";
+          }
+        }
+
+        async function getDenonStatusAsync() {
+    try {
+      const powerResponse = await fetch("http://192.168.178.21:8088/getPlainValue/denon.0.zoneMain.powerZone");
+      const power = await powerResponse.json();
+
+      const denonInfo = document.getElementById("denonInfo");
+
+      if (power === false) {
+        denonInfo.textContent = "Device is OFF";
+      } 
+    } catch (error) {
+      console.error("Error on getting DENON status:", error);
+      document.getElementById("denonInfo").textContent = "N/A";
+    }
+  }
+
+      </script>
+      
+  </head>
+  <body>
     <div class="room-heading">
-        <h1>Living Room</h1>
-        <h4>5 devices</h4>
+      <h1>Living Room</h1>
+      <h4>5 devices</h4>
+    </div>
+    <div class="presets">
+      <button>TV evening</button>
+      <button>Good Night</button>
     </div>
     <div class="room-devices">
-        <div class="row">
-            <h5>Heater Thermostate</h5>
-            <p>Desired: 22&deg;C</p>
-            
-            
-        </div>
+      <div class="row">
+        <h5>Heater Thermostat</h5>
+        Desired: <pre id="desiredLivingRoomTemp"></pre>&deg;C | Current: <pre id="livingRoomTemp"></pre>&deg;C | Dropdown
+      </div>
+      <div class="row">
+        <h5>DENON AVR X11000W</h5>
+        <span id="denonInfo">Loading...</span>
+      </div>      
+      <div class="row">
+        <h5>TCL C715 Android TV</h5>
+        Current State: OFF | Turn ON
+      </div>
+      <div class="row">
+        <h5>Dreame Bot D9</h5>
+        Current State: Standby | Dropdown
+      </div>
     </div>
-</body>
+  </body>
 </html>
